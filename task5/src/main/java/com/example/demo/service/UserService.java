@@ -1,0 +1,46 @@
+package com.example.demo.service;
+
+import com.example.demo.model.User;
+import com.example.demo.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.util.List;
+
+@Service
+public class UserService {
+
+    @Autowired
+    private UserRepository userRepository;
+
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
+    public User getUserById(Long id) {
+        return userRepository.findById(id).orElse(null);
+    }
+
+    public User createUser(User user) {
+        if (user.getDateAdded() == null) {
+            user.setDateAdded(LocalDate.now());
+        }
+        return userRepository.save(user);
+    }
+
+    public User updateUser(Long id, User updatedUser) {
+        return userRepository.findById(id).map(user -> {
+            user.setName(updatedUser.getName());
+            user.setEmail(updatedUser.getEmail());
+            if (updatedUser.getDateAdded() != null) {
+                user.setDateAdded(updatedUser.getDateAdded());
+            }
+            return userRepository.save(user);
+        }).orElse(null);
+    }
+
+    public void deleteUser(Long id) {
+        userRepository.deleteById(id);
+    }
+}
